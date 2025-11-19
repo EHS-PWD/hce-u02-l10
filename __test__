@@ -1,0 +1,133 @@
+const fs = require('fs');
+const path = require('path');
+
+describe('HTML Table Structure Tests', () => {
+  let html;
+  let document;
+
+  beforeAll(() => {
+    const htmlPath = path.join(__dirname, '../tables.html');
+
+    try {
+      html = fs.readFileSync(htmlPath, 'utf8');
+    } catch (error) {
+      throw new Error(`Could not find tables.html file at ${htmlPath}`);
+    }
+
+    const { JSDOM } = require('jsdom');
+    const dom = new JSDOM(html);
+    document = dom.window.document;
+  });
+
+  test('File exists: tables.html should be present', () => {
+    expect(html).toBeDefined();
+    expect(html.length).toBeGreaterThan(0);
+  });
+
+  test('HTML structure: has proper DOCTYPE declaration', () => {
+    expect(html.trim().toLowerCase()).toMatch(/^<!doctype html>/i);
+  });
+
+  test('HTML structure: has html tag with lang="en"', () => {
+    const htmlTag = document.querySelector('html');
+    expect(htmlTag).toBeTruthy();
+    expect(htmlTag.getAttribute('lang')).toBe('en');
+  });
+
+  test('HTML structure: has proper head section with charset and viewport', () => {
+    const metaCharset = document.querySelector('meta[charset="UTF-8"]');
+    const metaViewport = document.querySelector('meta[name="viewport"]');
+
+    expect(metaCharset).toBeTruthy();
+    expect(metaViewport).toBeTruthy();
+  });
+
+  test('HTML structure: has title "User Information Table"', () => {
+    const title = document.querySelector('title');
+    expect(title).toBeTruthy();
+    expect(title.textContent).toBe('User Information Table');
+  });
+
+  test('Content: has h2 heading "User Information Table"', () => {
+    const h2 = document.querySelector('h2');
+    expect(h2).toBeTruthy();
+    expect(h2.textContent).toBe('User Information Table');
+  });
+
+  test('Table structure: table element exists', () => {
+    const table = document.querySelector('table');
+    expect(table).toBeTruthy();
+  });
+
+  test('Table structure: has thead element', () => {
+    const thead = document.querySelector('table thead');
+    expect(thead).toBeTruthy();
+  });
+
+  test('Table structure: has tbody element', () => {
+    const tbody = document.querySelector('table tbody');
+    expect(tbody).toBeTruthy();
+  });
+
+  test('Table headers: thead contains correct headers (First Name, Last Name, Gender, Country)', () => {
+    const headers = Array.from(document.querySelectorAll('table thead th'));
+    expect(headers.length).toBe(4);
+
+    const headerTexts = headers.map(th => th.textContent.trim());
+    expect(headerTexts).toContain('First Name');
+    expect(headerTexts).toContain('Last Name');
+    expect(headerTexts).toContain('Gender');
+    expect(headerTexts).toContain('Country');
+  });
+
+  test('Table data: tbody contains at least 3 rows of data', () => {
+    const rows = document.querySelectorAll('table tbody tr');
+    expect(rows.length).toBeGreaterThanOrEqual(3);
+  });
+
+  test('Table data: each row has 4 columns (td elements)', () => {
+    const rows = document.querySelectorAll('table tbody tr');
+
+    rows.forEach((row, index) => {
+      const cells = row.querySelectorAll('td');
+      expect(cells.length).toBe(4);
+    });
+  });
+
+  test('Table data: first row contains sample data (John, Doe, Male, United States)', () => {
+    const firstRow = document.querySelector('table tbody tr:first-child');
+    expect(firstRow).toBeTruthy();
+
+    const cells = Array.from(firstRow.querySelectorAll('td'));
+    expect(cells.length).toBe(4);
+
+    const cellTexts = cells.map(td => td.textContent.trim());
+    expect(cellTexts[0]).toBe('John');
+    expect(cellTexts[1]).toBe('Doe');
+    expect(cellTexts[2]).toBe('Male');
+    expect(cellTexts[3]).toBe('United States');
+  });
+
+  test('Table data: all data cells (td) contain non-empty content', () => {
+    const cells = document.querySelectorAll('table tbody td');
+
+    cells.forEach((cell, index) => {
+      expect(cell.textContent.trim().length).toBeGreaterThan(0);
+    });
+  });
+
+  test('Correct tag usage: uses th tags in thead (not td)', () => {
+    const theadTd = document.querySelectorAll('thead td');
+    const theadTh = document.querySelectorAll('thead th');
+
+    expect(theadTd.length).toBe(0);
+    expect(theadTh.length).toBeGreaterThan(0);
+  });
+
+  test('Correct tag usage: uses td tags in tbody (not th)', () => {
+    const tbodyTh = document.querySelectorAll('tbody th');
+    const tbodyTd = document.querySelectorAll('tbody td');
+
+    expect(tbodyTd.length).toBeGreaterThan(0);
+  });
+});
