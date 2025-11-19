@@ -1,4 +1,4 @@
-### **Lesson 9: Table Structure**
+### **Lesson 10: Table Structure**
 
 #### **Objective:**
 
@@ -10,8 +10,7 @@ Students will create a new project that displays user information in a structure
 
 1. **Set Up Your New Project:**
 
-   - Create a new folder called `user-table-project` inside of your `unit02 - cw` folder.
-   - Inside this folder, create a new HTML file named `index.html`.
+   - Create a new HTML file named `tables.html`.
    - Use the following starter HTML structure:
 
      ```html
